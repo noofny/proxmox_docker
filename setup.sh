@@ -82,11 +82,10 @@ pct create "${CONTAINER_ID}" "${TEMPLATE_STRING}" \
     -features nesting=1,keyctl=1 \
     -hostname "${HOSTNAME}" \
     -net0 name=eth0,bridge=vmbr0,gw=${HOST_IP4_GATEWAY},ip=${HOST_IP4_CIDR} \
-    -mp0 volume=/mnt/portainer,mp=/mnt/portainer,backup=0 \
-    -mp1 volume=/mnt/unpoller,mp=/mnt/unpoller,backup=0 \
     -ostype "${CONTAINER_OS_TYPE}" \
     -password ${HOSTPASS} \
-    -storage "${STORAGE}"
+    -storage "${STORAGE}" \
+    || exit 1
 
 
 # Start container
