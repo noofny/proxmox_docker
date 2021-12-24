@@ -72,7 +72,7 @@ info "Using '$STORAGE' for storage location."
 
 
 # Create the container
-info "Creating Privileged LXC container..."
+info "Creating LXC container..."
 pct create "${CONTAINER_ID}" "${TEMPLATE_STRING}" \
     -arch "${CONTAINER_ARCH}" \
     -cores 2 \
