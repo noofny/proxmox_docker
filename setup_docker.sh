@@ -15,24 +15,30 @@ sed -e '/SendEnv/ s/^#*/#/' -i /etc/ssh/ssh_config
 
 
 echo "Installing dependencies..."
-apt-get install -y \
+apt install -y \
     apt-transport-https \
     ca-certificates \
-    gnupg2 \
     software-properties-common
 
 
 echo "Installing Docker..."
-curl -fsSL download.docker.com/linux/debian/gpg | \
+curl -fsSL download.docker.com/linux/ubuntu/gpg | \
     apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-apt update
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt update &&
 apt install \
     docker-ce \
     docker-ce-cli \
     containerd.io \
     docker-compose
-systemct1 enable docker
+systemctl enable docker
+
+
+# echo "Installing Docker..."
+# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+# apt-key fingerprint 0EBFCD88
+# apt-get update
+# apt install docker-ce=18.06.1~ce~3-0~ubuntu
 
 
 echo "Installing Portainer..."
