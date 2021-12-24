@@ -91,7 +91,7 @@ pct create "${CONTAINER_ID}" "${TEMPLATE_STRING}" \
 
 # Start container
 info "Starting LXC container..."
-pct start "${CONTAINER_ID}"
+pct start "${CONTAINER_ID}" || exit 1
 sleep 5
 CONTAINER_STATUS=$(pct status $CONTAINER_ID)
 if [ ${CONTAINER_STATUS} != "status: running" ]; then
