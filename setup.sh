@@ -116,6 +116,16 @@ info "Executing script..."
 cat ./setup_docker.sh
 pct push "${CONTAINER_ID}" ./setup_docker.sh /setup_docker.sh -perms 755
 pct exec "${CONTAINER_ID}" -- bash -c "/setup_docker.sh"
+pct reboot "${CONTAINER_ID}"
+
+
+# Setup portainer
+info "Fetching setup script..."
+wget -qL https://raw.githubusercontent.com/noofny/proxmox_docker/master/setup_portainer.sh
+info "Executing script..."
+cat ./setup_portainer.sh
+pct push "${CONTAINER_ID}" ./setup_portainer.sh /setup_portainer.sh -perms 755
+pct exec "${CONTAINER_ID}" -- bash -c "/setup_portainer.sh"
 
 
 # Done - reboot!
