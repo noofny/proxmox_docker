@@ -85,6 +85,7 @@ pct create "${CONTAINER_ID}" "${TEMPLATE_STRING}" \
     -ostype "${CONTAINER_OS_TYPE}" \
     -password ${HOSTPASS} \
     -storage "${STORAGE}" \
+    --unprivileged 1 \
     || exit 1
 
 
