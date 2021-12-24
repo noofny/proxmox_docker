@@ -16,6 +16,7 @@ sed -e '/SendEnv/ s/^#*/#/' -i /etc/ssh/ssh_config
 
 echo "Installing Portainer..."
 mkdir /mnt/portainer  # mp0: /mnt/portainer,mp=/mnt/portainer,backup=0
+mkdir /mnt/unpoller  # mp1: /mnt/unpoller,mp=/mnt/unpoller,backup=0
 docker run \
     -d \
     -p 8000:8000 -p 9000:9000 \
