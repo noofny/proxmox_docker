@@ -42,6 +42,10 @@ ufw enable
 ufw allow 22/tcp
 ufw allow http
 ufw allow https
+ufw allow 3000/tcp
+ufw allow 8086/tcp
+ufw allow 8000/tcp
+ufw allow 9000/tcp
 ufw status
 
 

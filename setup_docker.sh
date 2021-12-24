@@ -18,9 +18,9 @@ echo "Installing dependencies..."
 apt-get install -y \
     apt-transport-https \
     ca-certificates \
-    curl \
     gnupg2 \
     software-properties-common
+
 
 echo "Installing Docker..."
 curl -fsSL download.docker.com/linux/debian/gpg | \
@@ -44,7 +44,7 @@ docker run \
     --restart=always \
     --pull=always \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v /media/portainer:/data portainer/portainer-ce 
+    -v /mnt/portainer:/data portainer/portainer-ce 
 
 
 echo "Setup complete - you can access the console at http://$(hostname -I):9000/#!/home"

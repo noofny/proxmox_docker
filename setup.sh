@@ -22,28 +22,31 @@ pushd $TEMP_FOLDER_PATH >/dev/null
 
 
 # prompts/args
-DEFAULT_HOSTNAME='docker'
+DEFAULT_HOSTNAME='docker-1'
 DEFAULT_PASSWORD='dockeradmin'
 DEFAULT_IPV4_CIDR='192.168.0.30/24'
 DEFAULT_IPV4_GW='192.168.0.1'
+DEFAULT_CONTAINER_ID=$(pvesh get /cluster/nextid)
 read -p "Enter a hostname (${DEFAULT_HOSTNAME}) : " HOSTNAME
 read -s -p "Enter a password (${DEFAULT_PASSWORD}) : " HOSTPASS
 echo -e "\n"
 read -p "Enter an IPv4 CIDR (${DEFAULT_IPV4_CIDR}) : " HOST_IP4_CIDR
 read -p "Enter an IPv4 Gateway (${DEFAULT_IPV4_GW}) : " HOST_IP4_GATEWAY
+read -p "Enter a container ID (${DEFAULT_CONTAINER_ID}) : " CONTAINER_ID
+info "Using ContainerID: ${CONTAINER_ID}"
 HOSTNAME="${HOSTNAME:-${DEFAULT_HOSTNAME}}"
 HOSTPASS="${HOSTPASS:-${DEFAULT_PASSWORD}}"
 HOST_IP4_CIDR="${HOST_IP4_CIDR:-${DEFAULT_IPV4_CIDR}}"
 HOST_IP4_GATEWAY="${HOST_IP4_GATEWAY:-${DEFAULT_IPV4_GW}}"
 export HOST_IP4_CIDR=${HOST_IP4_CIDR}
 CONTAINER_OS_TYPE='ubuntu'
-CONTAINER_OS_VERSION='20.04'
+CONTAINER_OS_VERSION='21.04'
 CONTAINER_OS_STRING="${CONTAINER_OS_TYPE}-${CONTAINER_OS_VERSION}"
 info "Using OS: ${CONTAINER_OS_STRING}"
 CONTAINER_ARCH=$(dpkg --print-architecture)
 mapfile -t TEMPLATES < <(pveam available -section system | sed -n "s/.*\($CONTAINER_OS_STRING.*\)/\1/p" | sort -t - -k 2 -V)
 TEMPLATE="${TEMPLATES[-1]}"
-TEMPLATE_STRING="local:vztmpl/${TEMPLATE}"
+TEMPLATE_STRING="remote:vztmpl/${TEMPLATE}"
 info "Using template: ${TEMPLATE_STRING}"
 
 
@@ -68,23 +71,19 @@ fi
 info "Using '$STORAGE' for storage location."
 
 
-# Get the next guest VM/LXC ID
-CONTAINER_ID=$(pvesh get /cluster/nextid)
-info "Container ID is $CONTAINER_ID."
-
-
 # Create the container
-# TODO: specify root disk size!
 info "Creating Privileged LXC container..."
 pct create "${CONTAINER_ID}" "${TEMPLATE_STRING}" \
     -arch "${CONTAINER_ARCH}" \
-    -cores 4 \
+    -cores 2 \
     -memory 4096 \
     -swap 4096 \
     -onboot 1 \
     -features nesting=1,keyctl=1 \
     -hostname "${HOSTNAME}" \
     -net0 name=eth0,bridge=vmbr0,gw=${HOST_IP4_GATEWAY},ip=${HOST_IP4_CIDR} \
+    -mp0 volume=/mnt/portainer,mp=/mnt/portainer,backup=0 \
+    -mp1 volume=/mnt/unpoller,mp=/mnt/unpoller,backup=0 \
     -ostype "${CONTAINER_OS_TYPE}" \
     -password ${HOSTPASS} \
     -storage "${STORAGE}"
@@ -94,6 +93,11 @@ pct create "${CONTAINER_ID}" "${TEMPLATE_STRING}" \
 info "Starting LXC container..."
 pct start "${CONTAINER_ID}"
 sleep 5
+CONTAINER_STATUS=$(pct status $CONTAINER_ID)
+if [ ${CONTAINER_STATUS} != "status: running" ]; then
+    error "Container ${CONTAINER_ID} is not running! status=${CONTAINER_STATUS}"
+    exit 1
+fi
 
 
 # Setup OS
